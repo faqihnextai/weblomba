@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AppController;
 use App\Http\Controllers\AdminController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,8 +15,17 @@ use App\Http\Controllers\AdminController;
 */
 
 // Route untuk sisi user
-Route::get('/', [UserController::class, 'showForm'])->name('user.form');
-Route::post('/submit-pemenang', [UserController::class, 'submitPemenang'])->name('user.submit.pemenang'); // Tambahkan ini nanti untuk menyimpan data pemenang
+// Route untuk halaman utama (Form Pemenang)
+Route::get('/', [AppController::class, 'showFormPemenang'])->name('form.pemenang');
+
+// Route untuk submit form pemenang
+Route::post('/submit-pemenang', [AppController::class, 'submitPemenang'])->name('user.submit.pemenang');
+
+// Route untuk halaman Daftar Pemenang
+Route::get('/daftar-pemenang', [AppController::class, 'showDaftarPemenang'])->name('daftar.pemenang');
+
+// Route untuk halaman Kocok Klasifikasi
+Route::get('/kocok-klasifikasi', [AppController::class, 'showKocokKlasifikasi'])->name('kocok.klasifikasi');
 
 // Route untuk sisi admin
 Route::prefix('admin')->name('admin.')->group(function () {

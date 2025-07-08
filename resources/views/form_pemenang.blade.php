@@ -1,23 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pencatatan Pemenang</title>
-    <link rel="icon" href="flag_14009974.png" type="image/x-icon">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Warna abu-abu muda */
-        }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
+@extends('layouts.app')
+
+@section('title', 'Form Pencatatan Pemenang')
+
+@section('content')
+    <div id="content-form-pemenang" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200">
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Form Pencatatan Pemenang</h2>
+
+        {{-- Pesan sukses/error --}}
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Sukses!</strong>
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <ul class="mt-2 list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form action="{{ route('user.submit.pemenang') }}" method="POST">
             <!-- CSRF Token untuk keamanan Laravel -->
@@ -85,59 +90,55 @@
             </div>
         </form>
     </div>
+@endsection
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const namaLombaSelect = document.getElementById('nama_lomba');
-            const kelasLombaSelect = document.getElementById('kelas_lomba');
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const namaLombaSelect = document.getElementById('nama_lomba');
+        const kelasLombaSelect = document.getElementById('kelas_lomba');
 
-            function updateKelasLombaOptions() {
-                // Bersihkan opsi yang ada
-                kelasLombaSelect.innerHTML = '<option value="">Pilih Kelas Lomba</option>';
+        function updateKelasLombaOptions() {
+            kelasLombaSelect.innerHTML = '<option value="">Pilih Kelas Lomba</option>';
 
-                const selectedOption = namaLombaSelect.options[namaLombaSelect.selectedIndex];
-                const kategoriKelasJson = selectedOption.dataset.kategoriKelas;
+            const selectedOption = namaLombaSelect.options[namaLombaSelect.selectedIndex];
+            const kategoriKelasJson = selectedOption ? selectedOption.dataset.kategoriKelas : null;
 
-                if (kategoriKelasJson) {
-                    try {
-                        const kategoriKelasArray = JSON.parse(kategoriKelasJson);
+            if (kategoriKelasJson) {
+                try {
+                    const kategoriKelasArray = JSON.parse(kategoriKelasJson);
+                    kategoriKelasArray.forEach(kategori => {
+                        const option = document.createElement('option');
+                        option.value = kategori;
+                        option.textContent = kategori.charAt(0).toUpperCase() + kategori.slice(1);
+                        kelasLombaSelect.appendChild(option);
+                    });
 
-                        // Tambahkan opsi berdasarkan kategori yang tersedia
-                        kategoriKelasArray.forEach(kategori => {
-                            const option = document.createElement('option');
-                            option.value = kategori;
-                            option.textContent = kategori.charAt(0).toUpperCase() + kategori.slice(1); // Uppercase first letter
-                            kelasLombaSelect.appendChild(option);
-                        });
-
-                        // Jika hanya ada satu opsi, pilih otomatis
-                        if (kategoriKelasArray.length === 1) {
-                            kelasLombaSelect.value = kategoriKelasArray[0];
-                        }
-
-                        kelasLombaSelect.removeAttribute('disabled');
-                        kelasLombaSelect.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                        kelasLombaSelect.classList.add('bg-white', 'cursor-pointer');
-                    } catch (e) {
-                        console.error("Error parsing JSON for kategori_kelas:", e);
-                        kelasLombaSelect.setAttribute('disabled', 'disabled');
-                        kelasLombaSelect.classList.add('bg-gray-100', 'cursor-not-allowed');
-                        kelasLombaSelect.classList.remove('bg-white', 'cursor-pointer');
+                    if (kategoriKelasArray.length === 1) {
+                        kelasLombaSelect.value = kategoriKelasArray[0];
                     }
-                } else {
-                    // Jika tidak ada lomba yang dipilih, atau tidak ada kategori
+
+                    kelasLombaSelect.removeAttribute('disabled');
+                    kelasLombaSelect.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                    kelasLombaSelect.classList.add('bg-white', 'cursor-pointer');
+                } catch (e) {
+                    console.error("Error parsing JSON for kategori_kelas:", e);
                     kelasLombaSelect.setAttribute('disabled', 'disabled');
                     kelasLombaSelect.classList.add('bg-gray-100', 'cursor-not-allowed');
                     kelasLombaSelect.classList.remove('bg-white', 'cursor-pointer');
                 }
+            } else {
+                kelasLombaSelect.setAttribute('disabled', 'disabled');
+                kelasLombaSelect.classList.add('bg-gray-100', 'cursor-not-allowed');
+                kelasLombaSelect.classList.remove('bg-white', 'cursor-pointer');
             }
+        }
 
-            // Panggil saat halaman dimuat untuk inisialisasi
-            updateKelasLombaOptions();
+        // Panggil saat halaman dimuat untuk inisialisasi form
+        updateKelasLombaOptions();
 
-            // Panggil setiap kali pilihan nama lomba berubah
-            namaLombaSelect.addEventListener('change', updateKelasLombaOptions);
-        });
-    </script>
-</body>
-</html>
+        // Panggil setiap kali pilihan nama lomba berubah
+        namaLombaSelect.addEventListener('change', updateKelasLombaOptions);
+    });
+</script>
+@endsection

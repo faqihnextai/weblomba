@@ -6,21 +6,44 @@ use Illuminate\Http\Request;
 use App\Models\Lomba;
 use App\Models\Pemenang;
 
-class UserController extends Controller
+class AppController extends Controller
 {
-    public function showForm()
+    /**
+     * Menampilkan form pencatatan pemenang.
+     */
+    public function showFormPemenang()
     {
-        // Ambil semua lomba dari database
         $lombas = Lomba::all();
-        return view('user_form', compact('lombas'));
+        return view('form_pemenang', compact('lombas'));
     }
 
+    /**
+     * Menampilkan daftar pemenang.
+     */
+    public function showDaftarPemenang()
+    {
+        // Ambil semua pemenang dari database, dengan memuat relasi 'lomba'
+        $pemenangs = Pemenang::with('lomba')->get();
+        return view('pemenang_user_view', compact('pemenangs'));
+    }
+
+    /**
+     * Menampilkan halaman kocok klasifikasi.
+     */
+    public function showKocokKlasifikasi()
+    {
+        return view('klasifikasi');
+    }
+
+    /**
+     * Memproses submit form pencatatan pemenang.
+     */
     public function submitPemenang(Request $request)
     {
         // Validasi data yang masuk dari form
         $request->validate([
             'nama_lomba' => 'required|exists:lombas,id',
-            'kelas_lomba' => 'required|in:rendah,tinggi',
+            'kelas_lomba' => 'required|in:rendah,tinggi', // Sesuaikan jika ada kategori lain
             'nama_pemenang' => 'required|string|max:255',
             'kelas_pemenang' => 'required|string|max:255',
             'point_pemenang' => 'required|integer|min:0',
