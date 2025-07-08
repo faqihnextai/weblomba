@@ -12,6 +12,12 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6; /* Warna abu-abu muda */
+            /* Background image */
+            background-image: url('{{ asset('character-with-indonesian-flag.jpg') }}');
+            background-size: cover; /* Menutupi seluruh area body */
+            background-position: center; /* Posisikan gambar di tengah */
+            background-attachment: fixed; /* Gambar tetap saat di-scroll */
+            background-repeat: no-repeat; /* Jangan ulangi gambar */
         }
         /* Menyembunyikan elemen secara default untuk navigasi */
         .hidden-content {
@@ -69,8 +75,13 @@
     </div>
 
     <!-- Konten spesifik halaman akan di-inject di sini -->
-    <main class="flex-grow w-full flex justify-center items-start">
-        @yield('content')
+    <main class="flex-grow w-full flex flex-col items-center justify-start relative">
+        <!-- Icon Pita di atas konten utama, menutupi bagian atas -->
+        <img src="{{ asset('pita.png') }}" alt="Pita Dekorasi" class="absolute top-0 w-full h-auto object-cover z-10" style="height: 100px; object-fit: cover; transform: rotate(90deg) translateY(-50%); transform-origin: top left; left: -50px; width: calc(100% + 100px);">
+
+        <div class="relative z-20 w-full max-w-2xl mt-12"> <!-- Tambahkan margin-top untuk memberi ruang pada pita -->
+            @yield('content')
+        </div>
     </main>
 
     <!-- Footer -->
